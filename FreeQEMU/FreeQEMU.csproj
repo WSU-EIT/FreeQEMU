@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+<PropertyGroup>
+  <TargetFramework>net10.0</TargetFramework>
+  <ImplicitUsings>enable</ImplicitUsings>
+  <Nullable>enable</Nullable>
+  <LangVersion>preview</LangVersion>
+    
+  <!-- NuGet Package Info -->
+  <PackageId>FreeQEMU</PackageId>
+  <Version>2.0.0</Version>
+  <Authors>Daniel Pepka</Authors>
+  <Company>WSU-EIT</Company>
+  <Description>Run Linux commands from .NET using a lightweight QEMU VM. Supports presets for .NET SDK, Docker, and custom configurations with instant-boot snapshots.</Description>
+  <PackageTags>qemu;linux;vm;virtualization;dotnet;docker;cross-platform</PackageTags>
+  <PackageProjectUrl>https://github.com/WSU-EIT/FreeQEMU</PackageProjectUrl>
+  <RepositoryUrl>https://github.com/WSU-EIT/FreeQEMU</RepositoryUrl>
+  <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  <PackageReadmeFile>README.md</PackageReadmeFile>
+    
+  <!-- Generate XML documentation -->
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+</PropertyGroup>
+
+  <ItemGroup>
+    <!-- QEMU binaries (from Mosa.Tools.Package.Qemu) -->
+    <!-- PrivateAssets="none" ensures this flows through to consuming projects -->
+    <PackageReference Include="Mosa.Tools.Package.Qemu" Version="2.6.0.1532" PrivateAssets="none" />
+    
+    <!-- SSH client library -->
+    <PackageReference Include="SSH.NET" Version="2024.2.0" />
+    
+    <!-- ISO creation for cloud-init -->
+    <PackageReference Include="DiscUtils.Iso9660" Version="0.16.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
+  </ItemGroup>
+
+</Project>

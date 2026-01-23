@@ -1,0 +1,35 @@
+FreeQEMU Docker Build Results
+=============================
+Date: 2026-01-23 13:15:53
+Project: HelloWorldTest
+SDK Image: mcr.microsoft.com/dotnet/sdk:10.0
+
+=== FULL OUTPUT ===
+=== Restoring packages ===
+  Determining projects to restore...
+  Restored /src/HelloWorldTest.csproj (in 729 ms).
+=== Building project ===
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  HelloWorldTest -> /src/bin/Release/net10.0/HelloWorldTest.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:35.04
+=== Publishing project ===
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  HelloWorldTest -> /src/bin/Release/net10.0/HelloWorldTest.dll
+  HelloWorldTest -> /app/
+=== Running application ===
+Hello, World!
+
+=== ERRORS ===
+
+
+=== SUMMARY ===
+Exit Code: 0
+Success: True
+Duration: 66476ms

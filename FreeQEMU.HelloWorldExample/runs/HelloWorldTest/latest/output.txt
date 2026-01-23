@@ -1,0 +1,15 @@
+FreeQEMU Build & Run Results
+============================
+Date: 2026-01-23 11:54:29
+Project: HelloWorldTest
+
+=== RUN OUTPUT ===
+Hello, World!
+
+=== RUN ERRORS ===
+
+
+=== SUMMARY ===
+Exit Code: 0
+Success: True
+Duration: 615ms

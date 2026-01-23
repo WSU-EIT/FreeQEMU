@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="Docs/Docs.csproj" />
+  <Project Path="FreeQEMU.DockerExample/FreeQEMU.DockerExample.csproj" />
+  <Project Path="FreeQEMU.DockerExampleNugetTest/FreeQEMU.DockerExampleNugetTest.csproj" Id="6c4fd2b8-9887-43a0-9d9a-3e1d5f98568d" />
+  <Project Path="FreeQEMU.HelloWorldExample/FreeQEMU.HelloWorldExample.csproj" />
+  <Project Path="FreeQEMU.HelloWorldExampleNugetTest/FreeQEMU.HelloWorldExampleNugetTest.csproj" Id="8e6dc406-ba90-415e-907a-40c271c71521" />
+  <Project Path="FreeQEMU.NugetClientPublisher/FreeQEMU.NugetClientPublisher.csproj" />
+  <Project Path="FreeQEMU/FreeQEMU.csproj" />
+  <Project Path="HelloWorldTest/HelloWorldTest.csproj" />
+</Solution>

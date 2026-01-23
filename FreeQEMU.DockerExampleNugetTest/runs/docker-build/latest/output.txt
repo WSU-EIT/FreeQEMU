@@ -1,0 +1,48 @@
+FreeQEMU Docker Example (NuGet Package Test)
+=============================================
+Date: 2026-01-23 13:59:11
+Project: HelloWorldTest
+SDK Image: mcr.microsoft.com/dotnet/sdk:10.0
+FreeQEMU Version: 1.0.1 (NuGet)
+
+=== FULL OUTPUT ===
+
+
+=== ERRORS ===
+Unable to find image 'mcr.microsoft.com/dotnet/sdk:10.0' locally
+10.0: Pulling from dotnet/sdk
+a3629ac5b9f4: Pulling fs layer
+47849234c411: Pulling fs layer
+06762f394a85: Pulling fs layer
+95c4e06fe864: Pulling fs layer
+46f592c23ae7: Pulling fs layer
+e26f93cf9c70: Pulling fs layer
+59287b3c3c70: Pulling fs layer
+60fc5ac8adb0: Pulling fs layer
+69c84e01b5c0: Pulling fs layer
+da1a80ccb2fc: Pulling fs layer
+e26f93cf9c70: Download complete
+95c4e06fe864: Download complete
+da1a80ccb2fc: Download complete
+59287b3c3c70: Download complete
+06762f394a85: Download complete
+47849234c411: Download complete
+60fc5ac8adb0: Download complete
+a3629ac5b9f4: Download complete
+46f592c23ae7: Download complete
+a3629ac5b9f4: Pull complete
+47849234c411: Pull complete
+95c4e06fe864: Pull complete
+46f592c23ae7: Pull complete
+e26f93cf9c70: Pull complete
+59287b3c3c70: Pull complete
+69c84e01b5c0: Download complete
+60fc5ac8adb0: Pull complete
+docker: failed to extract layer (application/vnd.docker.image.rootfs.diff.tar.gzip sha256:69c84e01b5c01378575ef094890e0918566b96793b25e89e1a2f0c5c939c0f8d) to overlayfs as "extract-33124289-z83y sha256:16ea13bda801caea5f955da3841c013e206f2a32dbd427ee05ab0b174f69c316": write /var/lib/containerd/io.containerd.snapshotter.v1.overlayfs/snapshots/8/fs/usr/share/dotnet/sdk/10.0.102/Sdks/Microsoft.NET.Sdk.Razor/tasks/net472/System.Reflection.Metadata.dll: no space left on device
+
+Run 'docker run --help' for more information
+
+=== SUMMARY ===
+Exit Code: 125
+Success: False
+Duration: 85000ms
