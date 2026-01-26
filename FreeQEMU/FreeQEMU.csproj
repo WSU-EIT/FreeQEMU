@@ -26,6 +26,10 @@
     <!-- QEMU binaries (from Mosa.Tools.Package.Qemu) -->
     <!-- PrivateAssets="none" ensures this flows through to consuming projects -->
     <PackageReference Include="Mosa.Tools.Package.Qemu" Version="2.6.0.1532" PrivateAssets="none" />
+    <PackageReference Include="NuGetizer" Version="1.4.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     
     <!-- SSH client library -->
     <PackageReference Include="SSH.NET" Version="2024.2.0" />
