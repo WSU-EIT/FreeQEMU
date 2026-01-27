@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Text.Json;
 
 namespace FreeQEMU.NugetClientPublisher;
@@ -1182,6 +1183,9 @@ internal class Program
             Console.WriteLine($"  ✓ Package created: {packagePath}");
             Console.WriteLine($"    Size: {new FileInfo(packagePath).Length / 1024.0:F1} KB");
             Console.ResetColor();
+
+            // Analyze package contents to diagnose potential duplicate file issues
+            AnalyzePackageContents(packagePath);
         }
     }
 
@@ -1497,6 +1501,9 @@ internal class Program
             return;
         }
 
+        // Analyze package contents to diagnose potential duplicate file issues
+        AnalyzePackageContents(packagePath);
+
         // Step 5: Push
         Console.WriteLine();
         Console.WriteLine("  Step 5/5: Pushing to NuGet.org...");
@@ -1716,6 +1723,174 @@ internal class Program
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Analyzes the contents of a .nupkg file to help diagnose duplicate file issues.
+    /// The .nupkg is just a ZIP file, so we can inspect its contents.
+    /// </summary>
+    private static void AnalyzePackageContents(string packagePath)
+    {
+        Console.WriteLine();
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("  ═══════════════════════════════════════════════════════════════");
+        Console.WriteLine("                    PACKAGE CONTENTS ANALYSIS                    ");
+        Console.WriteLine("  ═══════════════════════════════════════════════════════════════");
+        Console.ResetColor();
+        Console.WriteLine();
+
+        try
+        {
+            using var archive = System.IO.Compression.ZipFile.OpenRead(packagePath);
+            
+            // Group entries by folder
+            var entriesByFolder = archive.Entries
+                .Where(e => !string.IsNullOrEmpty(e.Name)) // Skip directory entries
+                .GroupBy(e => Path.GetDirectoryName(e.FullName)?.Replace('\\', '/') ?? "(root)")
+                .OrderBy(g => g.Key)
+                .ToList();
+
+            Console.WriteLine($"  Total files in package: {archive.Entries.Count(e => !string.IsNullOrEmpty(e.Name))}");
+            Console.WriteLine($"  Total folders: {entriesByFolder.Count}");
+            Console.WriteLine();
+
+            // Check for duplicates - files with same name in same folder
+            var duplicates = new List<(string folder, string fileName, int count)>();
+            
+            foreach (var group in entriesByFolder)
+            {
+                var fileNames = group.Select(e => e.Name.ToLowerInvariant()).ToList();
+                var duplicateNames = fileNames.GroupBy(n => n).Where(g => g.Count() > 1).ToList();
+                
+                foreach (var dup in duplicateNames)
+                {
+                    duplicates.Add((group.Key, dup.Key, dup.Count()));
+                }
+            }
+
+            if (duplicates.Any())
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("  ╔════════════════════════════════════════════════════════════╗");
+                Console.WriteLine("  ║              ⚠️  DUPLICATE FILES DETECTED!                 ║");
+                Console.WriteLine("  ╚════════════════════════════════════════════════════════════╝");
+                Console.ResetColor();
+                Console.WriteLine();
+
+                foreach (var (folder, fileName, count) in duplicates)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"  DUPLICATE: '{fileName}' appears {count} times in folder '{folder}'");
+                    Console.ResetColor();
+                    
+                    // Show the actual entries
+                    var matchingEntries = archive.Entries
+                        .Where(e => e.Name.Equals(fileName, StringComparison.OrdinalIgnoreCase) &&
+                                   (Path.GetDirectoryName(e.FullName)?.Replace('\\', '/') ?? "(root)") == folder)
+                        .ToList();
+                    
+                    foreach (var entry in matchingEntries)
+                    {
+                        Console.WriteLine($"    → {entry.FullName} ({entry.Length:N0} bytes)");
+                    }
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("  ✓ No duplicate files detected within same folders.");
+                Console.ResetColor();
+                Console.WriteLine();
+            }
+
+            // Show all contents grouped by folder
+            Console.WriteLine("  PACKAGE STRUCTURE:");
+            Console.WriteLine("  ──────────────────────────────────────────────────────────────");
+            
+            foreach (var group in entriesByFolder)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"  📁 {group.Key}/");
+                Console.ResetColor();
+                
+                foreach (var entry in group.OrderBy(e => e.Name))
+                {
+                    var sizeStr = entry.Length > 1024 * 1024 
+                        ? $"{entry.Length / 1024.0 / 1024.0:F1} MB"
+                        : entry.Length > 1024 
+                            ? $"{entry.Length / 1024.0:F1} KB"
+                            : $"{entry.Length} B";
+                    
+                    Console.WriteLine($"      {entry.Name} ({sizeStr})");
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("  ──────────────────────────────────────────────────────────────");
+            
+            // Show lib folder contents specifically (common source of issues)
+            var libEntries = archive.Entries
+                .Where(e => e.FullName.StartsWith("lib/", StringComparison.OrdinalIgnoreCase) ||
+                           e.FullName.StartsWith("lib\\", StringComparison.OrdinalIgnoreCase))
+                .Where(e => !string.IsNullOrEmpty(e.Name))
+                .ToList();
+
+            if (libEntries.Any())
+            {
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("  LIB FOLDER CONTENTS (main package assemblies):");
+                Console.ResetColor();
+                
+                var libByTfm = libEntries
+                    .GroupBy(e => Path.GetDirectoryName(e.FullName)?.Replace('\\', '/') ?? "lib")
+                    .OrderBy(g => g.Key);
+
+                foreach (var tfmGroup in libByTfm)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine($"    📁 {tfmGroup.Key}/");
+                    Console.ResetColor();
+                    
+                    foreach (var entry in tfmGroup.OrderBy(e => e.Name))
+                    {
+                        Console.WriteLine($"        {entry.Name}");
+                    }
+                }
+            }
+
+            // Show contentFiles folder specifically
+            var contentEntries = archive.Entries
+                .Where(e => e.FullName.StartsWith("contentFiles/", StringComparison.OrdinalIgnoreCase) ||
+                           e.FullName.StartsWith("contentFiles\\", StringComparison.OrdinalIgnoreCase) ||
+                           e.FullName.StartsWith("content/", StringComparison.OrdinalIgnoreCase) ||
+                           e.FullName.StartsWith("content\\", StringComparison.OrdinalIgnoreCase))
+                .Where(e => !string.IsNullOrEmpty(e.Name))
+                .ToList();
+
+            if (contentEntries.Any())
+            {
+                Console.WriteLine();
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("  CONTENT FILES (potential source of duplicates):");
+                Console.ResetColor();
+                
+                foreach (var entry in contentEntries.OrderBy(e => e.FullName))
+                {
+                    Console.WriteLine($"    {entry.FullName}");
+                }
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"  ✗ Failed to analyze package: {ex.Message}");
+            Console.ResetColor();
+        }
+
+        Console.WriteLine();
     }
 
     private static async Task<(bool Success, string Output)> RunCommandAsync(string command, string arguments, string workingDirectory, bool hideOutput = true)

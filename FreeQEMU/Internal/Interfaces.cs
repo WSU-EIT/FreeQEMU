@@ -6,6 +6,11 @@
 internal interface IQemuProcessManager : IDisposable
 {
     /// <summary>
+    /// Kills any orphaned QEMU processes to release file locks.
+    /// </summary>
+    Task KillOrphanedProcessesAsync();
+
+    /// <summary>
     /// Ensures the base VM image exists, downloading if necessary.
     /// </summary>
     Task EnsureBaseImageAsync(IProgress<VmSetupProgress>? progress, CancellationToken cancellationToken);

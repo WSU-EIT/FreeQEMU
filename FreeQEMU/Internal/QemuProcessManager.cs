@@ -28,6 +28,16 @@ internal sealed class QemuProcessManager : IQemuProcessManager
             Console.WriteLine(message);
     }
 
+    /// <summary>
+    /// Kills any orphaned QEMU processes to release file locks.
+    /// Call this before any file operations on the disk image.
+    /// </summary>
+    public async Task KillOrphanedProcessesAsync()
+    {
+        await KillAllQemuProcessesAsync();
+    }
+
+
     public async Task EnsureBaseImageAsync(IProgress<VmSetupProgress>? progress, CancellationToken cancellationToken)
     {
         Directory.CreateDirectory(_config.ImagesDirectory);
@@ -74,17 +84,26 @@ internal sealed class QemuProcessManager : IQemuProcessManager
             Console.WriteLine();
         }
 
-        // If we already have the image file AND snapshots exist, skip verification
-        // (snapshot data modifies the qcow2 file, changing its checksum)
+        // If we already have the image file, check if it's been prepared (resized or has snapshots)
+        // Resizing and snapshots both modify the qcow2 file, changing its checksum
         if (File.Exists(_config.BaseImagePath))
         {
+            var fileInfo = new FileInfo(_config.BaseImagePath);
+            var fileSizeMb = fileInfo.Length / 1024 / 1024;
+            
+            // Original Debian cloud image is ~350MB. If it's larger, it's been resized.
+            // Also check for snapshots.
             var snapshotManager = new SnapshotManager(_config);
             var snapshots = await snapshotManager.ListAsync(cancellationToken);
-            if (snapshots.Count > 0)
+            
+            if (snapshots.Count > 0 || fileSizeMb > 400)
             {
+                var reason = snapshots.Count > 0 
+                    ? $"{snapshots.Count} snapshot(s)" 
+                    : "already resized";
                 progress?.Report(new VmSetupProgress(VmSetupStage.VerifyingImage, 
-                    $"Using cached image with {snapshots.Count} snapshot(s)"));
-                return; // Image has snapshots, skip checksum (it will be different)
+                    $"Using cached image ({reason})"));
+                return; // Image has been prepared, skip checksum
             }
         }
 
@@ -329,11 +348,8 @@ internal sealed class QemuProcessManager : IQemuProcessManager
         if (IsRunning)
             throw new QemuProcessException("QEMU is already running");
 
-        // Kill QEMU processes based on configuration
-        if (_config.KillAllQemuOnStart)
-        {
-            await KillAllQemuProcessesAsync();
-        }
+        // Always kill any orphaned QEMU processes to avoid file lock issues
+        await KillAllQemuProcessesAsync();
 
         var qemuPath = Path.Combine(_config.QemuDirectory, "qemu-system-x86_64.exe");
         if (!File.Exists(qemuPath))

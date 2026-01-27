@@ -77,6 +77,9 @@ public sealed class LinuxVm : IDisposable, IAsyncDisposable
     {
         ThrowIfDisposed();
 
+        // Kill any orphaned QEMU processes first to avoid file lock issues
+        await _processManager.KillOrphanedProcessesAsync();
+
         // Step 1: Ensure base image exists
         progress?.Report(new VmSetupProgress(VmSetupStage.DownloadingBaseImage, "Checking base image..."));
         await _processManager.EnsureBaseImageAsync(progress, cancellationToken);

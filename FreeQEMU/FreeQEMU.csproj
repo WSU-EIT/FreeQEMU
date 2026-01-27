@@ -38,8 +38,4 @@
     <PackageReference Include="DiscUtils.Iso9660" Version="0.16.13" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Include="README.md" Pack="true" PackagePath="\" Condition="Exists('README.md')" />
-  </ItemGroup>
-
 </Project>

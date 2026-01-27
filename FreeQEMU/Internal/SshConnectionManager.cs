@@ -41,10 +41,17 @@ internal sealed class SshConnectionManager : ISshConnectionManager
             {
                 Log($"  [SSH] Port {_config.ActualSshPort} is open after {stopwatch.Elapsed.TotalSeconds:F1}s ({attempts} attempts)");
 
-                // Port is open, but SSH might not be fully ready - do a quick auth test
-                await Task.Delay(1000, cancellationToken); // Give sshd a moment
+                // Port is open, but SSH might not be fully ready - give cloud-init time to set up keys
+                Log($"  [SSH] Waiting for cloud-init to configure SSH keys...");
+                await Task.Delay(5000, cancellationToken); // Wait 5s for cloud-init
+                
                 Log($"  [SSH] Testing SSH authentication...");
-                return;
+                
+                if (await TryAuthenticateAsync(timeout - stopwatch.Elapsed, cancellationToken))
+                {
+                    Log($"  [SSH] Authentication successful!");
+                    return;
+                }
             }
 
             if (attempts % 10 == 0)
@@ -57,6 +64,45 @@ internal sealed class SshConnectionManager : ISshConnectionManager
 
         throw new SshConnectionException($"SSH connection timed out after {timeoutSeconds} seconds ({attempts} attempts)");
     }
+
+    private async Task<bool> TryAuthenticateAsync(TimeSpan remainingTimeout, CancellationToken cancellationToken)
+    {
+        var authStopwatch = Stopwatch.StartNew();
+        var maxAuthAttempts = 30; // Try for up to 30 attempts
+        
+        for (int i = 0; i < maxAuthAttempts && authStopwatch.Elapsed < remainingTimeout; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            Log($"  [SSH] Auth attempt {i + 1}/{maxAuthAttempts}...");
+            
+            try
+            {
+                using var client = CreateSshClient();
+                client.Connect();
+                
+                // Try a simple command to verify connection works
+                using var cmd = client.CreateCommand("echo ok");
+                cmd.CommandTimeout = TimeSpan.FromSeconds(10);
+                var result = cmd.Execute();
+                
+                client.Disconnect();
+                
+                if (result.Trim() == "ok")
+                {
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"  [SSH] Auth attempt {i + 1} failed: {ex.Message}");
+            }
+            
+            await Task.Delay(2000, cancellationToken); // Wait 2s between auth attempts
+        }
+        
+        return false;
+    }
+
 
     public async Task<CommandResult> ExecuteCommandAsync(
         string command,
