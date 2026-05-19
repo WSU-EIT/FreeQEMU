@@ -1,41 +1,30 @@
 ﻿# FreeQEMU
 
-[![NuGet](https://img.shields.io/nuget/v/FreeQEMU.svg)](https://www.nuget.org/packages/FreeQEMU)
+Run Linux commands from .NET using lightweight QEMU virtual machines. Published as a NuGet package with example consumers (HelloWorld, Docker) plus a publisher tool. Useful for cross-platform builds and isolated command execution from .NET applications.
 
-Run Linux commands from .NET using a lightweight QEMU VM.
+## Projects in this solution
 
-## Quick Start
+| Project | Role |
+|---------|------|
+| `FreeQEMU` | Core library — NuGet package source |
+| `FreeQEMU.HelloWorldExample` | Example: build/run with .NET SDK preset (project reference) |
+| `FreeQEMU.DockerExample` | Example: build/run via Docker containers (project reference) |
+| `FreeQEMU.HelloWorldExampleNugetTest` | Same as HelloWorld but using published NuGet package |
+| `FreeQEMU.DockerExampleNugetTest` | Same as Docker but using published NuGet package |
+| `FreeQEMU.NugetClientPublisher` | Interactive CLI tool for packing and pushing to NuGet.org |
+| `HelloWorldTest` | Minimal console app used as the build target in all examples |
 
-    dotnet add package FreeQEMU
-    dotnet add package Mosa.Tools.Package.Qemu
+See each project README.md for its specific role.
 
-## Projects
-
-- **FreeQEMU** - Core library (NuGet package)
-- **FreeQEMU.HelloWorldExample** - Build .NET projects in VM
-- **FreeQEMU.DockerExample** - Build with Docker containers
-- **FreeQEMU.NugetClientPublisher** - Tool to publish to NuGet.org
-
-## VM Presets
-
-- Stock - Vanilla Debian 12
-- DotNet8/9/10 - .NET SDK installed
-- Docker - Docker Engine
-- DockerDotNet9/10 - Docker + .NET SDK image (v2.0.0+)
-- Full - .NET 8/9/10 + Docker
-
-## Documentation
-
-See [FreeQEMU/README.md](FreeQEMU/README.md) for full documentation.
-
-## Links
-
-- [NuGet Package](https://www.nuget.org/packages/FreeQEMU)
-- [GitHub Repository](https://github.com/WSU-EIT/FreeQEMU)
+Part of the FreeQEMU solution.
 
 ## License
 
-MIT License
+Released under the [MIT License](https://opensource.org/licenses/MIT).
 
----
-Made with love by WSU-EIT
+## About
+
+Designed, written, and implemented by **Washington State University - Enrollment Information Technology (WSU-EIT)**.
+
+- Website: https://em.wsu.edu/eit/
+- GitHub: https://github.com/WSU-EIT

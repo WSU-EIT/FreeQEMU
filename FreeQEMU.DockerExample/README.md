@@ -143,3 +143,16 @@ Use `WithDiskSize(15)` if you need to pull multiple images.
 
 - [FreeQEMU.HelloWorldExample](../FreeQEMU.HelloWorldExample/) - Basic .NET SDK builds
 - [FreeQEMU README](../FreeQEMU/README.md) - Full library documentation
+
+Part of the FreeQEMU solution.
+
+## License
+
+Released under the [MIT License](https://opensource.org/licenses/MIT).
+
+## About
+
+Designed, written, and implemented by **Washington State University - Enrollment Information Technology (WSU-EIT)**.
+
+- Website: https://em.wsu.edu/eit/
+- GitHub: https://github.com/WSU-EIT

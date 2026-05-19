@@ -351,14 +351,15 @@ The repository includes full working examples:
 | `FreeQEMU.DockerExampleNugetTest` | Same as Docker but using NuGet package |
 | `HelloWorldTest` | Simple .NET 10 console app used as build target |
 
-## 📄 License
+Part of the FreeQEMU solution.
 
-MIT License - See [LICENSE](../LICENSE) for details.
+## License
 
-## 🤝 Contributing
+Released under the [MIT License](https://opensource.org/licenses/MIT).
 
-Contributions welcome! Please see the [GitHub repository](https://github.com/WSU-EIT/FreeQEMU) for guidelines.
+## About
 
----
+Designed, written, and implemented by **Washington State University - Enrollment Information Technology (WSU-EIT)**.
 
-Made with ❤️ by [WSU-EIT](https://github.com/WSU-EIT)
+- Website: https://em.wsu.edu/eit/
+- GitHub: https://github.com/WSU-EIT

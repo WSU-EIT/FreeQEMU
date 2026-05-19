@@ -151,3 +151,16 @@ The `SolutionRoot` setting supports environment variables:
 
 - [FreeQEMU README](../FreeQEMU/README.md) - Package documentation
 - [NuGet.org Package](https://www.nuget.org/packages/FreeQEMU) - Published package
+
+Part of the FreeQEMU solution.
+
+## License
+
+Released under the [MIT License](https://opensource.org/licenses/MIT).
+
+## About
+
+Designed, written, and implemented by **Washington State University - Enrollment Information Technology (WSU-EIT)**.
+
+- Website: https://em.wsu.edu/eit/
+- GitHub: https://github.com/WSU-EIT

@@ -94,3 +94,16 @@ For faster Docker builds, wait for v2.0.0+ with `VmPreset.DockerDotNet10`.
 
 - [FreeQEMU.DockerExample](../FreeQEMU.DockerExample/) - Project reference version
 - [FreeQEMU on NuGet](https://www.nuget.org/packages/FreeQEMU) - Published package
+
+Part of the FreeQEMU solution.
+
+## License
+
+Released under the [MIT License](https://opensource.org/licenses/MIT).
+
+## About
+
+Designed, written, and implemented by **Washington State University - Enrollment Information Technology (WSU-EIT)**.
+
+- Website: https://em.wsu.edu/eit/
+- GitHub: https://github.com/WSU-EIT
